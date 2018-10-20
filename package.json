@@ -3,17 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@types/lodash": "^4.14.116",
-    "@types/react-redux": "^6.0.9",
     "antd": "^3.9.2",
-    "connected-react-router": "^4.4.0",
+    "axios": "^0.18.0",
+    "connected-react-router": "^4.5.0",
     "history": "^4.6.1",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-redux": "^5.0.7",
     "react-router": "^4.1.1",
     "react-router-dom": "^4.1.1",
-    "redux": "^4.0.0"
+    "redux": "^4.0.0",
+    "redux-thunk": "^2.3.0"
   },
   "scripts": {
     "start": "react-scripts-ts-antd start",
@@ -22,17 +22,22 @@
     "eject": "react-scripts-ts-antd eject"
   },
   "devDependencies": {
-    "@types/history": "^4.5.0",
+    "@types/history": "^4.7.0",
     "@types/jest": "^23.3.2",
+    "@types/lodash": "^4.14.116",
     "@types/node": "^10.10.1",
     "@types/react": "^16.4.14",
     "@types/react-dom": "^16.0.7",
+    "@types/react-redux": "^6.0.9",
+    "@types/react-router": "^4.0.31",
+    "@types/react-router-dom": "^4.2.0",
+    "@types/react-router-redux": "^4.0.51",
     "react-scripts-ts": "^3.1.0",
     "react-scripts-ts-antd": "^2.17.0",
-    "reflect-metadata": "^0.1.12",
     "redux-devtools": "^3.1.0",
     "redux-devtools-dock-monitor": "^1.0.1",
     "redux-devtools-log-monitor": "^1.0.4",
+    "reflect-metadata": "^0.1.12",
     "typescript": "^3.0.3"
   }
 }

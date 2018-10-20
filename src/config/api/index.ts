@@ -21,4 +21,4 @@ switch (process.env.NODE_ENV) {
     }
 }
 
-export {config};
+export { config };

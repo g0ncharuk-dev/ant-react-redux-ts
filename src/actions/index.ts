@@ -2,11 +2,13 @@
 import * as constants from '@app/constants';
 
 export interface IAction {
-    type: constants.mainActionTypes.TEST
+    type: string;
+    payload: any;
 }
 
-export function test(): IAction {
+export function isAuth(data: boolean): IAction {
     return {
-        type: constants.mainActionTypes.TEST
+        type: constants.mainActionTypes.ISAUTHORIZED, 
+        payload: data
     };
 }
