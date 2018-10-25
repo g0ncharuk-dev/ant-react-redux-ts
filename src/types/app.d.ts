@@ -1,13 +1,13 @@
-// export = App;
-// export as namespace App;
+export = App;
+export as namespace App;
 
-// declare namespace App {
-//
-//     // interface IApiConfig {
-//     //     API_DOMAIN:  string;
-//     // }
-//
-// }
+declare namespace App {
+
+    interface IApiConfig {
+        API_DOMAIN:  string;
+    }
+
+}
 
 
 declare module '*.svg'
