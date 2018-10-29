@@ -1,6 +1,6 @@
-import {config as api} from '@app/config/api'
+import {config as api} from '@app/config/api';
 
-const configMenu: any = [
+export const MENU: any = [
     {
         id: 0,
         name: "Dashboard ",
@@ -53,12 +53,48 @@ const configMenu: any = [
     // }
 ];
 
-export const configApi: any = {
-    auth: api.API_DOMAIN + 'auth',
-    getFilters: api.API_DOMAIN + 'filter/list',
-    createFilter: api.API_DOMAIN + 'filter/store',
-    updateFilter: api.API_DOMAIN + 'filter/update',
-    deleteFilter: api.API_DOMAIN + 'filter/delete',
+export const NOTIFICATION: any = {
+    getError: {
+        type:'error',
+        message: 'Неудача!',
+        description: 'Данные не удалось получить! Попробуйте обновить страницу'
+    },
+    addSuccess: {
+        type:'success',
+        message: 'Успешно!',
+        description: 'Данные успешно отправленно!'
+    },
+    editSuccess: {
+        type:'success',
+        message: 'Успешно!',
+        description: 'Данные успешно измененны!'
+    },
+    deleteSuccess: {
+        type:'success',
+        message: 'Успешно',
+        description: 'Данные успешно удаленны!'
+    },
+    addError: {
+        type:'error',
+        message: 'Неудача!',
+        description: 'Данные неудалось добавить!'
+    },
+    editError: {
+        type:'error',
+        message: 'Неудача!',
+        description: 'Данные неудалось изменить!'
+    },
+    deleteError: {
+        type:'error',
+        message: 'Неудача!',
+        description: 'Данные неудалось удалить!'
+    },
 };
 
-export default configMenu;
+export const API: any = {
+    auth: api.API_DOMAIN + 'auth',
+    getFilters: api.API_DOMAIN + 'filter/list',
+    addFilter: api.API_DOMAIN + 'filter/store',
+    editFilter: api.API_DOMAIN + 'filter/update',
+    deleteFilter: api.API_DOMAIN + 'filter/delete',
+};

@@ -3,7 +3,7 @@ import Map from "lodash/map";
 import {Link} from 'react-router-dom';
 import {Menu, Icon} from 'antd';
 
-import configMenu from "@app/config/app";
+import {MENU} from "@app/config/app";
 import "./LayoutCustom.less";
 
 const {SubMenu, ItemGroup} = Menu;
@@ -57,7 +57,7 @@ class Menus extends React.Component<any> {
         return (
             <>
                 <Menu mode={"inline"} theme={"dark"}>
-                    {this.getMenus(configMenu)}
+                    {this.getMenus(MENU)}
                 </Menu>
             </>
         );
