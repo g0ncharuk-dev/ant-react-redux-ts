@@ -97,4 +97,10 @@ export const API: any = {
     addFilter: api.API_DOMAIN + 'filter/store',
     editFilter: api.API_DOMAIN + 'filter/update',
     deleteFilter: api.API_DOMAIN + 'filter/delete',
+
+    getCategory: api.API_DOMAIN + 'category/list',
+    getCategoryTree: api.API_DOMAIN + 'category/three',
+    addCategory: api.API_DOMAIN + 'category/store',
+    editCategory: api.API_DOMAIN + 'category/update',
+    deleteCategory: api.API_DOMAIN + 'category/delete',
 };
