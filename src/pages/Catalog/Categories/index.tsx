@@ -1,12 +1,15 @@
 import * as React from 'react';
-import {Table, Button, Form, Input,
-    Icon, Row, Col, Cascader, Select
+import {
+    Table, Button, Form, Input,
+    Icon, Row, Col, Cascader, Select,
+    Upload, message
 } from 'antd';
 import _last from 'lodash/last';
 import _map from 'lodash/map';
 
 import request from '@app/utils/request';
 import auth from '@app/utils/auth';
+import helper from '@app/utils/helper';
 import {API, NOTIFICATION} from "@app/config/app";
 
 import ActionDrawer from "@app/components/ActionDrawer";
@@ -75,7 +78,7 @@ class Categories extends React.Component<any, any, any> {
             actionId: record.id
         });
 
-        setTimeout(()=>{
+        setTimeout(() => {
             if (this.state.actionType === 'edit') {
                 form.setFields({
                     name: {
@@ -126,8 +129,9 @@ class Categories extends React.Component<any, any, any> {
 
     public handleDelete = (id: number) => {
         this.requestDelete({
-            'remember_token': auth.getToken(),
-            'id': id}
+                'remember_token': auth.getToken(),
+                'id': id
+            }
         );
     };
 
@@ -136,6 +140,13 @@ class Categories extends React.Component<any, any, any> {
         const form = this.props.form;
         form.resetFields();
     }
+
+    public handleImageChange = (info: any) => {
+        helper.getBase64(info.file, (imgUrl: string) => this.setState({
+            imgUrl,
+            loadingUpload: false,
+        }));
+    };
 
     public render() {
         const {height, form} = this.props;
@@ -146,75 +157,127 @@ class Categories extends React.Component<any, any, any> {
                            onClick={this.handleShowDrawer.bind(this, 'edit', record)}
                            ghost={true}>Редактировать</Button>
         };
-
         const deleteButton = () => {
             return this.state.actionType === 'edit' ?
                 <Button onClick={this.handleDelete.bind(this, this.state.actionId)}
-                        type="danger"><Icon type="delete" theme="outlined" /></Button> : ''
+                        type="danger"><Icon type="delete" theme="outlined"/></Button> : ''
         };
-
         const submitButton = () => {
             return <Button onClick={this.handleSubmit.bind(this, this.state.actionId)} type="primary">Отправить</Button>
         };
 
-        const selectOption = (data:any)=>{
-            return _map(data, (item:any) => {
+        const selectOption = (data: any) => {
+            return _map(data, (item: any) => {
                 const valItem =
-                typeof item === 'string' ? JSON.parse(item) : item;
-                const valString:string = JSON.stringify({id:valItem.id,name:valItem.name});
+                    typeof item === 'string' ? JSON.parse(item) : item;
+                const valString: string = JSON.stringify({id: valItem.id, name: valItem.name});
                 return <Option key={valItem.id} value={valString}>{valItem.name}</Option>
             })
         };
-        const selectCharacteristic:any = selectOption(this.state.dataCharacteristic);
-        const selectFilters:any = selectOption(form.getFieldValue('characteristic'));
+        const selectCharacteristic: any = selectOption(this.state.dataCharacteristic);
+
+        const selectFilters: any = selectOption(form.getFieldValue('characteristic'));
+
+        const beforeUpload = (file: any) => {
+            const isImage = file.type.indexOf('image/') >= 0;
+            if (!isImage) {
+                message.error('Вы можете выбрать только изображения');
+            }
+            return false;
+        };
 
         const formFields = () => {
             return (
                 <>
                     <Form layout="vertical">
                         <Row gutter={16}>
-                            <Col span={12}>
-                                <FormItem label="Название">
-                                    {getFieldDecorator('name', {
-                                        rules: [{required: true, message: 'Пожалуйста, введите название фильтра!'}],
-                                    })(<Input placeholder="Пожалуйста введите"/>)}
+                            <Col span={5}>
+                                <FormItem label="Изображение">
+                                    {getFieldDecorator('image', {
+                                        rules: [{required: true, message: 'Пожалуйста, выберите изображение!'}],
+                                    })(
+                                        <Upload
+                                            listType="picture-card"
+                                            className="image-uploader"
+                                            showUploadList={false}
+                                            beforeUpload={beforeUpload}
+                                            onChange={this.handleImageChange}>
+                                            {this.state.imgUrl ?
+                                                <img src={this.state.imgUrl} width={'100%'} alt="image"/> :
+                                                <div>
+                                                    <Icon type={this.state.loadingUpload ? 'loading' : 'plus'}/>
+                                                    <div className="ant-upload-text">Выберите</div>
+                                                </div>}
+                                        </Upload>)}
                                 </FormItem>
                             </Col>
-                            <Col span={12}>
-                                <FormItem label="Родительский каталог">
-                                    {getFieldDecorator('parent', {
-                                        rules: [{ type: 'array', required: true, message: 'Пожалуйста выберите каталог!' }],
-                                    })(<Cascader
-                                            options={this.state.dataTree}
-                                            fieldNames={{ label: 'name', value: 'id', children: 'children' }}
-                                            placeholder="Пожалуйста выберите"
-                                            changeOnSelect={true}
-                                        />
-                                    )}
-                                </FormItem>
+                            <Col span={19}>
+                                <Row gutter={16}>
+                                    <Col span={12}>
+                                        <FormItem label="Название">
+                                            {getFieldDecorator('name', {
+                                                rules: [{required: true, message: 'Пожалуйста, введите название фильтра!'}],
+                                            })(<Input placeholder="Пожалуйста введите"/>)}
+                                        </FormItem>
+                                    </Col>
+                                    <Col span={12}>
+                                        <FormItem label="Родительский каталог">
+                                            {getFieldDecorator('parent', {
+                                                rules: [{
+                                                    type: 'array',
+                                                    required: true,
+                                                    message: 'Пожалуйста выберите каталог!'
+                                                }],
+                                            })(<Cascader
+                                                    options={this.state.dataTree}
+                                                    fieldNames={{label: 'name', value: 'id', children: 'children'}}
+                                                    placeholder="Пожалуйста выберите"
+                                                    changeOnSelect={true}
+                                                />
+                                            )}
+                                        </FormItem>
+                                    </Col>
+                                    <Col span={12}>
+                                    <FormItem label="Все характеристики">
+                                        {getFieldDecorator('characteristic', {
+                                            rules: [{required: true, message: 'Пожалуйста, выберите характеристики!'}],
+                                        })(<Select
+                                            mode="multiple"
+                                            placeholder="Пожалуйста выберите">
+                                            {selectCharacteristic}
+                                        </Select>)}
+                                    </FormItem>
+                                </Col>
+                                    <Col span={12}>
+                                        <FormItem label="Фильтры">
+                                            {getFieldDecorator('filters', {
+                                                rules: [{required: true, message: 'Пожалуйста, выберите фильтры!'}],
+                                            })(<Select
+                                                mode="multiple"
+                                                placeholder="Пожалуйста выберите">
+                                                {selectFilters}
+                                            </Select>)}
+                                        </FormItem>
+                                    </Col>
+                                </Row>
                             </Col>
                         </Row>
                         <Row gutter={16}>
-                            <Col span={12}>
-                                <FormItem label="Все характеристики">
-                                    {getFieldDecorator('characteristic', {
-                                        rules: [{required: true, message: 'Пожалуйста, выберите характеристики!'}],
-                                    })(<Select
-                                        mode="multiple"
-                                        placeholder="Пожалуйста выберите">
-                                        {selectCharacteristic}
-                                    </Select>)}
+                            <Col span={8}>
+                                <FormItem label="Title">
+                                    {getFieldDecorator('title', {
+                                        rules: [{required: true, message: 'Пожалуйста, введите Title!'}],
+                                    })(<Input placeholder="Пожалуйста введите"/>)}
                                 </FormItem>
                             </Col>
-                            <Col span={12}>
-                                <FormItem label="Фильтры">
-                                    {getFieldDecorator('filters', {
-                                        rules: [{required: true, message: 'Пожалуйста, выберите фильтры!'}],
-                                    })(<Select
-                                        mode="multiple"
-                                        placeholder="Пожалуйста выберите">
-                                        {selectFilters}
-                                    </Select>)}
+                            <Col span={8}>
+                                <FormItem label="Description">
+                                    {getFieldDecorator('description')(<Input placeholder="Пожалуйста введите"/>)}
+                                </FormItem>
+                            </Col>
+                            <Col span={8}>
+                                <FormItem label="Keywords">
+                                    {getFieldDecorator('keywords')(<Input placeholder="Пожалуйста введите"/>)}
                                 </FormItem>
                             </Col>
                         </Row>
