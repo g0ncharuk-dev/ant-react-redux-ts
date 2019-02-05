@@ -1,5 +1,5 @@
 import axios from 'axios';
-import auth from '@app/utils/auth';
+import auth from '@app/utils/localStorage';
 
 const request = {
     post(url: string, data: {} = { token: auth.getToken() }) {

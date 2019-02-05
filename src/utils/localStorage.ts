@@ -3,7 +3,7 @@ const stringify: any  = JSON.stringify;
 
 const TOKEN_KEY = 'TOKEN_KEY';
 
-const auth = {
+const LOCALSTORAGE = {
     get(key: string) {
         if (localStorage && localStorage.getItem(key)) {
             return parse(localStorage.getItem(key));
@@ -15,7 +15,7 @@ const auth = {
 
         return null;
     },
-    set(value: any, key: string, isLocalStorage: boolean) {
+    set(key: string, value: any, isLocalStorage?: boolean) {
 
         if (isLocalStorage && localStorage) {
             return localStorage.setItem(key, stringify(value));
@@ -48,12 +48,12 @@ const auth = {
     },
 
     getToken(tokenKey = TOKEN_KEY) {
-        return auth.get(tokenKey);
+        return LOCALSTORAGE.get(tokenKey);
     },
     setToken(value = '', isLocalStorage = false, tokenKey = TOKEN_KEY) {
-        return auth.set(value, tokenKey, isLocalStorage);
+        return LOCALSTORAGE.set(value, tokenKey, isLocalStorage);
     }
 
 };
 
-export default auth
+export default LOCALSTORAGE

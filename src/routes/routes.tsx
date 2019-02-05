@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {Route, Switch} from "react-router-dom";
-import authUtil from '@app/utils/auth';
+import authUtil from '@app/utils/localStorage';
 
 import {ProtectedRoute} from "@app/components/ProtectedRoute";
 import {NoMatch} from "@app/pages";

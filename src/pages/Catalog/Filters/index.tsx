@@ -2,7 +2,7 @@ import * as React from 'react';
 import {Table, Button, Form, Input, Icon} from 'antd';
 
 import request from '@app/utils/request';
-import auth from '@app/utils/auth';
+import auth from '@app/utils/localStorage';
 import {API, NOTIFICATION} from "@app/config/app";
 
 import ActionDrawer from "@app/components/ActionDrawer";

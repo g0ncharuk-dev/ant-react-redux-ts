@@ -1,14 +1,14 @@
 import * as React from "react";
-// import { Redirect } from "react-router-dom";
-import { Layout, Row, Col, Card, Form, Icon, Input, Button, Alert  } from "antd";
+import { Redirect } from "react-router-dom";
+import { Layout, Row, Col, Card, Form, Icon, Input, Button } from "antd";
 import axios from "axios";
 
 import { API } from "@app/config/app";
+import localStorageHelper from "@app/utils/localStorage";
 import "@app/pages/Auth/Auth.less";
 
 const logo = "/static/images/logo.svg";
-
-const  FormItem = Form.Item;
+const FormItem = Form.Item;
 
 interface IProps {
     isAuthorized: boolean;
@@ -17,22 +17,89 @@ interface IProps {
 export class Auth extends React.Component<any, any> {
     constructor(props: IProps) {
         super(props);
-
-        // const storage: any = localStorage.getItem("isAuth");
-        this.setState({
-            isAuthorized: window.localStorage.getItem("isAuth")
-        })
+        this.state = {
+            redirectToReferrer: false
+        }
     }
-    public componentWillReceiveProps(nextProps:any) {
-        console.log(this.state.isAuthorized )
+
+    public componentWillUnmount () {
+        this.setState(() => ({
+            redirectToReferrer: false
+        })) 
     }
 
     public render() {
-        console.log(this.state.isAuthorized );
         const { getFieldDecorator } = this.props.form;
+        const { redirectToReferrer } = this.state
+
+        const isAuth: boolean = JSON.parse(localStorageHelper.get('isAuth'));
+        const checkAuth = (auth: boolean) => {
+            if (auth) {
+                return (
+                    <Redirect to="/" />
+                )
+            }
+            return (<Card>
+                <Form onSubmit={this.handleSubmit} className="login-form">
+                    <div>
+                        <h1>Login</h1>
+                    </div>
+                    <FormItem>
+                        {getFieldDecorator("email", {
+                            rules: [
+                                {
+                                    required: true,
+                                    message: "Please input your login! example: Guest"
+                                }
+                            ]
+                        })(
+                            <Input
+                                prefix={
+                                    <Icon
+                                        type="user"
+                                        style={{ color: "rgba(0,0,0,.25)" }}
+                                    />
+                                }
+                                placeholder="Login"
+                            />
+                        )}
+                    </FormItem>
+                    <FormItem>
+                        {getFieldDecorator("password", {
+                            rules: [
+                                {
+                                    required: true,
+                                    message:
+                                        "Please input your Password! example: Guest"
+                                }
+                            ]
+                        })(
+                            <Input
+                                prefix={
+                                    <Icon
+                                        type="lock"
+                                        style={{ color: "rgba(0,0,0,.25)" }}
+                                    />
+                                }
+                                type="password"
+                                placeholder="Password"
+                            />
+                        )}
+                    </FormItem>
+                    <FormItem>
+                        <Button htmlType="submit" type="primary" className="login-form-button">
+                            Log in
+                                            </Button>
+                    </FormItem>
+                </Form>
+            </Card>)
+        }
+
+        if (redirectToReferrer === true) {
+            return <Redirect to='/' />
+        }
 
         return (
-        
             <div className={"auth__page"}>
                 <Row>
                     <Col span={12}>
@@ -53,72 +120,7 @@ export class Auth extends React.Component<any, any> {
                     <Col span={12}>
                         <Layout>
                             <div className={"auth__form"}>
-                             <Card>
-                    <Form onSubmit={this.handleSubmit} className="login-form">
-                        <div>
-                            <h1>Login</h1>
-                        </div>
-                        <FormItem>
-                            {getFieldDecorator("email", {
-                                rules: [
-                                    {
-                                        required: true,
-                                        message: "Please input your login! example: Guest"
-                                    }
-                                ]
-                            })(
-                                <Input
-                                    prefix={
-                                        <Icon
-                                            type="user"
-                                            style={{ color: "rgba(0,0,0,.25)" }}
-                                        />
-                                    }
-                                    placeholder="Login"
-                                />
-                            )}
-                        </FormItem>
-                        <FormItem>
-                            {getFieldDecorator("password", {
-                                rules: [
-                                    {
-                                        required: true,
-                                        message:
-                                            "Please input your Password! example: Guest"
-                                    }
-                                ]
-                            })(
-                                <Input
-                                    prefix={
-                                        <Icon
-                                            type="lock"
-                                            style={{ color: "rgba(0,0,0,.25)" }}
-                                        />
-                                    }
-                                    type="password"
-                                    placeholder="Password"
-                                />
-                            )}
-                        </FormItem>
-                        <FormItem>
-                            <Button htmlType="submit" className="login-form-button">
-                                Log in
-                            </Button>
-                        </FormItem>
-                    </Form>
-                </Card>
-     
-                <Card>
-                    <Alert
-                        message="Informational Notes"
-                        description="Additional description and informations about copywriting."
-                        type="info"
-                        showIcon={true}
-                    />
-                    <Button className={"auth__alert_btn"} block={true}>
-                        Go to main page
-                    </Button>
-                </Card>
+                                {checkAuth(isAuth)}
                             </div>
                         </Layout>
                     </Col>
@@ -139,10 +141,15 @@ export class Auth extends React.Component<any, any> {
                             email: data.email,
                             password: data.password
                         }
-                    }).then(res => {
+                    }).then((res: any) => {
                         if (res && res.status === 200) {
-                            localStorage.setItem("isAuth", "true");
+                            localStorageHelper.set('isAuth', true, true);
+                            localStorageHelper.set('TOKEN_KEY', res.data, true);
 
+
+                            this.setState(() => ({
+                                redirectToReferrer: true
+                            }))
                         }
                     });
                 }

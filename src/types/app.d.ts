@@ -9,7 +9,3 @@ declare namespace App {
 
 }
 
-
-declare module '*.svg'
-declare module '*.png'
-declare module '*.jpg'

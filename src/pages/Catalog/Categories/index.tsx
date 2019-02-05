@@ -8,7 +8,7 @@ import _last from 'lodash/last';
 import _map from 'lodash/map';
 
 import request from '@app/utils/request';
-import auth from '@app/utils/auth';
+import auth from '@app/utils/localStorage';
 import helper from '@app/utils/helper';
 import {API, NOTIFICATION} from "@app/config/app";
 
