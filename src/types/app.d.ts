@@ -4,14 +4,8 @@ export as namespace App;
 declare namespace App {
 
     interface IApiConfig {
-        api: {
-            connection: string;
-        }
+        API_DOMAIN:  string;
     }
-    
+
 }
 
-
-declare module '*.svg'
-declare module '*.png'
-declare module '*.jpg'

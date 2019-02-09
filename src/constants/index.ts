@@ -1,4 +1,11 @@
 
 export const enum mainActionTypes {
-    TEST = 'main/TEST'
+    FETCH_AUTH = '@api/auth',
+    ISAUTHORIZED = '@app/isAuthorized',
 }
+
+export interface IsAuthorized {
+    type: mainActionTypes.ISAUTHORIZED;
+}
+
+export type IAction = IsAuthorized;

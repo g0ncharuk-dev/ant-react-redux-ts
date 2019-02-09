@@ -14,10 +14,8 @@ class SiderCustom extends React.Component {
     };
 
     public onCollapse = (collapsed:boolean) => {
-        // console.log(collapsed);
         this.setState({ collapsed });
-    }
-
+    };
     public render() {
         return (
             <Sider
@@ -26,7 +24,7 @@ class SiderCustom extends React.Component {
                 collapsed={this.state.collapsed}
                 onCollapse={this.onCollapse}>
                 <Logo />
-                <Menus />
+                <Menus {...this.props} />
             </Sider>
         )
     }

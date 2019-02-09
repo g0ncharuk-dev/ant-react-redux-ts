@@ -1,9 +1,7 @@
 import App from "@app/types/app";
 
 const config: App.IApiConfig = {
-    api: {
-        connection: "http://api.lc-dev.foodcore.com.ua",
-    }
+    API_DOMAIN: "https://portmonetka.com.ua/api/"
 };
 
 export { config };
