@@ -165,7 +165,6 @@ class Categories extends React.Component<any, any, any> {
         const submitButton = () => {
             return <Button onClick={this.handleSubmit.bind(this, this.state.actionId)} type="primary">Отправить</Button>
         };
-
         const selectOption = (data: any) => {
             return _map(data, (item: any) => {
                 const valItem =

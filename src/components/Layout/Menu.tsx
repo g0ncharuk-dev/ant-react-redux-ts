@@ -56,7 +56,7 @@ class Menus extends React.Component<any> {
     public render() {
         return (
             <>
-                <Menu mode={"inline"} theme={"dark"}>
+                <Menu mode={"inline"} theme={'light'}>
                     {this.getMenus(MENU)}
                 </Menu>
             </>

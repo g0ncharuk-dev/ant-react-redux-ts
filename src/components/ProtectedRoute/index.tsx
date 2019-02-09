@@ -4,6 +4,7 @@ import { Route, Redirect } from 'react-router-dom';
 import {
     Dashboard,
     Test,
+    Profile,
     Catalog
 } from "@app/pages";
 
@@ -16,6 +17,7 @@ export class ProtectedRoute extends React.Component<any> {
                 case 'products': return <Catalog.Products {...this.props}/>;
                 case 'categories': return <Catalog.Categories {...this.props}/>;
                 case 'filters': return <Catalog.Filters {...this.props}/>;
+                case 'profile': return <Profile {...this.props}/>;
                 case 'test': return <Test {...this.props}/>;
                 default: return null
             }
