@@ -327,7 +327,7 @@ class Categories extends React.Component<any, any, any> {
                         size={'middle'}
                         dataSource={this.state.data}
                         pagination={{pageSize: 50}}
-                        scroll={{y: height - 40 - 40 - 40}}>
+                        scroll={{y: height - 160}}>
                         {dataScheme.map(item => <Table.Column key={item.title} {...item} />)}
                         <Table.Column
                             key="action"
