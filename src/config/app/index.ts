@@ -9,8 +9,14 @@ export const MENU: any = [
         page: "dashboard"
     }, {
         id: 1,
-        name: "Каталог ",
+        name: "Заказы ",
         icon: "shopping-cart",
+        path: "/orders",
+        page: "Orders"
+    }, {
+        id: 2,
+        name: "Каталог ",
+        icon: "shop",
         subMenu: [
             {id: 5, name: "Товары", path: "/catalog/products", page: "products", icon: ""},
             {id: 6, name: "Категории", path: "/catalog/categories", page: "categories", icon: ""},

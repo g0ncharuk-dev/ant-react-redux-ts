@@ -5,7 +5,8 @@ import {
     Dashboard,
     Test,
     Profile,
-    Catalog
+    Catalog,
+    Setting
 } from "@app/pages";
 
 export class ProtectedRoute extends React.Component<any> {
@@ -18,6 +19,7 @@ export class ProtectedRoute extends React.Component<any> {
                 case 'categories': return <Catalog.Categories {...this.props}/>;
                 case 'filters': return <Catalog.Filters {...this.props}/>;
                 case 'profile': return <Profile {...this.props}/>;
+                case 'setting': return <Setting {...this.props}/>;
                 case 'test': return <Test {...this.props}/>;
                 default: return null
             }

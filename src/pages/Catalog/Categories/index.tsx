@@ -4,6 +4,8 @@ import {
     Icon, Row, Col, Cascader, Select,
     Upload, message
 } from 'antd';
+import Draft, { htmlToDraft, draftToHtml } from 'react-wysiwyg-typescript'
+
 import _last from 'lodash/last';
 import _map from 'lodash/map';
 
@@ -52,7 +54,8 @@ class Categories extends React.Component<any, any, any> {
         super(props);
         this.state = {
             loading: false,
-            visibleDrawer: false
+            visibleDrawer: false,
+            editorState: htmlToDraft('Your html contents')
         };
     }
 
@@ -102,18 +105,19 @@ class Categories extends React.Component<any, any, any> {
             //     values.parent.length,
             //     _last(values.parent)
             // );
+            values.seo_text = draftToHtml(values.seo_text);
 
             if (err) {
                 return;
             }
 
             switch (this.state.actionType) {
-                case 'add123':
+                case 'add':
                     return this.requestAdd({
                         'remember_token': auth.getToken(),
                         ...values
                     });
-                case 'edit123':
+                case 'edit':
                     return this.requestEdit({
                         'remember_token': auth.getToken(),
                         'id': id,
@@ -184,6 +188,7 @@ class Categories extends React.Component<any, any, any> {
             }
             return false;
         };
+        const editorStateChanger = (editorState:any) => { this.setState({ editorState }) }
 
         const formFields = () => {
             return (
@@ -277,6 +282,18 @@ class Categories extends React.Component<any, any, any> {
                             <Col span={8}>
                                 <FormItem label="Keywords">
                                     {getFieldDecorator('keywords')(<Input placeholder="Пожалуйста введите"/>)}
+                                </FormItem>
+                            </Col>
+                            <Col span={24}>
+                                <FormItem label="Seo text">
+                                    {getFieldDecorator('seo_text', {
+                                        rules: [{ required: true, message: 'Пожалуйста введите' }],
+                                    })(
+                                        <Draft
+                                            editorState={this.state.editorState}
+                                            onEditorStateChange={editorStateChanger}
+                                        />
+                                    )}
                                 </FormItem>
                             </Col>
                         </Row>
@@ -423,6 +440,8 @@ class Categories extends React.Component<any, any, any> {
                 }
             })
     };
+
+    
 
 }
 
