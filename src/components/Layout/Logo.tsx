@@ -5,7 +5,7 @@ const logo = '/static/images/logo.svg';
 class Sider extends React.Component {
     public render() {
         return (
-            <div className={'logo dark'}>
+            <div className={'logo'}>
                 <img alt="logo" src={logo} />
             </div>
         )
