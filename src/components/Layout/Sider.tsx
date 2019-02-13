@@ -19,7 +19,7 @@ class SiderCustom extends React.Component {
     public render() {
         return (
             <Sider
-                theme={'dark'}
+                theme={'light'}
                 collapsible={true}
                 collapsed={this.state.collapsed}
                 onCollapse={this.onCollapse}>
