@@ -6,6 +6,4 @@ declare namespace App {
     interface IApiConfig {
         API_DOMAIN:  string;
     }
-
 }
-

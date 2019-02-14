@@ -1,14 +1,17 @@
 import * as React from 'react';
-import {Table, Button, Form, Input, Icon} from 'antd';
+import { Table, Button, Form, Input, Icon, Modal } from 'antd';
 
 import request from '@app/utils/request';
+import jsonToForm from '@app/utils/formdata';
 import auth from '@app/utils/localStorage';
-import {API, NOTIFICATION} from "@app/config/app";
+import { API, NOTIFICATION } from "@app/config/app";
 
 import ActionDrawer from "@app/components/ActionDrawer";
 import Notification from "@app/components/Notification";
 
 const FormItem = Form.Item;
+const Confirm = Modal.confirm;
+
 const dataScheme = [
     {
         title: 'id',
@@ -62,7 +65,7 @@ class Filters extends React.Component<any, any, any> {
             actionId: record.id
         });
 
-        setTimeout(()=>{
+        setTimeout(() => {
             if (this.state.actionType === 'edit') {
                 form.setFields({
                     name: {
@@ -82,21 +85,20 @@ class Filters extends React.Component<any, any, any> {
         form.validateFields((err: any, values: any) => {
             if (err) {
                 return;
-            }
+            }          
 
             switch (this.state.actionType) {
                 case 'add':
-                    return this.requestAdd({
+                    return this.requestAdd(jsonToForm.transform({
                         'remember_token': auth.getToken(),
                         ...values
-                    });
+                    }));
                 case 'edit':
-                    return this.requestEdit({
+                    return this.requestEdit(jsonToForm.transform({
                         'remember_token': auth.getToken(),
                         'id': id,
                         ...values
-                    })
-                        ;
+                    }));
                 default:
                     return
             }
@@ -105,32 +107,44 @@ class Filters extends React.Component<any, any, any> {
     };
 
     public handleDelete = (id: number) => {
-        this.requestDelete({
-            'remember_token': auth.getToken(),
-            'id': id}
-        );
+        const deleteItem = () => {
+            this.requestDelete({
+                'remember_token': auth.getToken(),
+                'id': id
+            });
+        }
+        Confirm({
+            title: 'Вы уверены что хотите удалить?',
+            okText: 'Да',
+            okType: 'danger',
+            cancelText: 'Нет',
+            onOk() {
+                deleteItem();
+            }
+        });
+
     };
 
     public handleResetForm() {
-        this.setState({visibleDrawer: false});
+        this.setState({ visibleDrawer: false });
         const form = this.props.form;
         form.resetFields();
     }
 
     public render() {
-        const {height, form} = this.props;
-        const {getFieldDecorator} = form;
+        const { height, form } = this.props;
+        const { getFieldDecorator } = form;
 
         const editButton = (empty: any, record: any) => {
             return <Button type="primary"
-                           onClick={this.handleShowDrawer.bind(this, 'edit', record)}
-                           ghost={true}>Редактировать</Button>
+                onClick={this.handleShowDrawer.bind(this, 'edit', record)}
+                ghost={true}>Редактировать</Button>
         };
 
         const deleteButton = () => {
             return this.state.actionType === 'edit' ?
                 <Button onClick={this.handleDelete.bind(this, this.state.actionId)}
-                        type="danger"><Icon type="delete" theme="outlined" /></Button> : ''
+                    type="danger"><Icon type="delete" theme="outlined" /></Button> : ''
         };
 
         const submitButton = () => {
@@ -143,9 +157,9 @@ class Filters extends React.Component<any, any, any> {
                     <Form layout="vertical">
                         <FormItem label="Название">
                             {getFieldDecorator('name', {
-                                rules: [{required: true, message: 'Пожалуйста, введите название фильтра!'}],
+                                rules: [{ required: true, message: 'Пожалуйста, введите название фильтра!' }],
                             })(
-                                <Input/>
+                                <Input />
                             )}
                         </FormItem>
                     </Form>
@@ -161,11 +175,11 @@ class Filters extends React.Component<any, any, any> {
                             background: '#fff',
                             borderRadius: '0 0 4px 4px',
                         }}>
-                        <div style={{flex: 1}}>
+                        <div style={{ flex: 1 }}>
                             {deleteButton()}
                         </div>
                         <Button
-                            style={{marginRight: 8}}
+                            style={{ marginRight: 8 }}
                             onClick={this.handleClose}>
                             Отменить
                         </Button>
@@ -184,8 +198,8 @@ class Filters extends React.Component<any, any, any> {
                     onClose={this.handleClose}>
                     {formFields()}
                 </ActionDrawer>
-                <div style={{background: '#fff', padding: 10}}>
-                    <div style={{paddingBottom: 10}}>
+                <div style={{ background: '#fff', padding: 10 }}>
+                    <div style={{ paddingBottom: 10 }}>
                         <Button type="primary" onClick={this.handleShowDrawer.bind(this, '')}>Создать</Button>
                     </div>
                     <Table
@@ -194,8 +208,8 @@ class Filters extends React.Component<any, any, any> {
                         loading={this.state.loading}
                         size={'middle'}
                         dataSource={this.state.data}
-                        pagination={{pageSize: 50}}
-                        scroll={{y: height - 160}}>
+                        pagination={{ pageSize: 50 }}
+                        scroll={{ y: height - 160 }}>
                         {dataScheme.map(item => <Table.Column key={item.title} {...item} />)}
                         <Table.Column
                             key="action"
@@ -220,9 +234,9 @@ class Filters extends React.Component<any, any, any> {
                     }
                 }
             }).catch((error) => {
-            Notification(NOTIFICATION.getError);
-            return error
-        });
+                Notification(NOTIFICATION.getError);
+                return error
+            });
     }
 
     private requestAdd(data: any) {

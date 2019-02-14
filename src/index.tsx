@@ -15,6 +15,7 @@ import registerServiceWorker from './registerServiceWorker';
 ReactDOM.render(
   <Provider store={ store }>
     <App history={ history } />
+    
   </Provider>
   ,
   document.getElementById('root') as HTMLElement

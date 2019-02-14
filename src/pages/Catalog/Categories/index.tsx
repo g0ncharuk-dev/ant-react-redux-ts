@@ -12,10 +12,11 @@ import _map from 'lodash/map';
 import request from '@app/utils/request';
 import auth from '@app/utils/localStorage';
 import helper from '@app/utils/helper';
-import {API, NOTIFICATION} from "@app/config/app";
+import { API, NOTIFICATION } from "@app/config/app";
 
 import ActionDrawer from "@app/components/ActionDrawer";
 import Notification from "@app/components/Notification";
+import jsonToForm from '@app/utils/formdata';
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -55,7 +56,7 @@ class Categories extends React.Component<any, any, any> {
         this.state = {
             loading: false,
             visibleDrawer: false,
-            editorState: htmlToDraft('Your html contents')
+            editorState: htmlToDraft('')
         };
     }
 
@@ -100,23 +101,28 @@ class Categories extends React.Component<any, any, any> {
     public handleSubmit = (id: number) => {
         const form = this.props.form;
         form.validateFields((err: any, values: any) => {
-            console.log(values);
-            // console.log(
-            //     values.parent.length,
-            //     _last(values.parent)
-            // );
-            values.seo_text = draftToHtml(values.seo_text);
-
             if (err) {
                 return;
             }
 
+            values.level = values.father_id.length;
+            values.father_id = _last(values.father_id);
+            values.seo_text = draftToHtml(values.seo_text);
+            values.filter_all = _map(values.filter_all, (item: any) => {
+                const valItem = typeof item === 'string' ? JSON.parse(item) : item;
+                return valItem.id
+            });
+            values.filters_check = _map(values.filters_check, (item: any) => {
+                const valItem = typeof item === 'string' ? JSON.parse(item) : item;
+                return valItem.id
+            });
+
             switch (this.state.actionType) {
                 case 'add':
-                    return this.requestAdd({
+                    return this.requestAdd(jsonToForm.transform({
                         'remember_token': auth.getToken(),
                         ...values
-                    });
+                    }));
                 case 'edit':
                     return this.requestEdit({
                         'remember_token': auth.getToken(),
@@ -133,14 +139,14 @@ class Categories extends React.Component<any, any, any> {
 
     public handleDelete = (id: number) => {
         this.requestDelete({
-                'remember_token': auth.getToken(),
-                'id': id
-            }
+            'remember_token': auth.getToken(),
+            'id': id
+        }
         );
     };
 
     public handleResetForm() {
-        this.setState({visibleDrawer: false});
+        this.setState({ visibleDrawer: false });
         const form = this.props.form;
         form.resetFields();
     }
@@ -153,33 +159,32 @@ class Categories extends React.Component<any, any, any> {
     };
 
     public render() {
-        const {height, form} = this.props;
-        const {getFieldDecorator} = form;
+        const { height, form } = this.props;
+        const { getFieldDecorator } = form;
 
         const editButton = (empty: any, record: any) => {
             return <Button type="primary"
-                           onClick={this.handleShowDrawer.bind(this, 'edit', record)}
-                           ghost={true}>Редактировать</Button>
+                onClick={this.handleShowDrawer.bind(this, 'edit', record)}
+                ghost={true}>Редактировать</Button>
         };
         const deleteButton = () => {
             return this.state.actionType === 'edit' ?
                 <Button onClick={this.handleDelete.bind(this, this.state.actionId)}
-                        type="danger"><Icon type="delete" theme="outlined"/></Button> : ''
+                    type="danger"><Icon type="delete" theme="outlined" /></Button> : ''
         };
         const submitButton = () => {
             return <Button onClick={this.handleSubmit.bind(this, this.state.actionId)} type="primary">Отправить</Button>
         };
         const selectOption = (data: any) => {
             return _map(data, (item: any) => {
-                const valItem =
-                    typeof item === 'string' ? JSON.parse(item) : item;
-                const valString: string = JSON.stringify({id: valItem.id, name: valItem.name});
+                const valItem = typeof item === 'string' ? JSON.parse(item) : item;
+                const valString: string = JSON.stringify({ id: valItem.id, name: valItem.name });
                 return <Option key={valItem.id} value={valString}>{valItem.name}</Option>
             })
         };
         const selectCharacteristic: any = selectOption(this.state.dataCharacteristic);
 
-        const selectFilters: any = selectOption(form.getFieldValue('characteristic'));
+        const selectFilters: any = selectOption(form.getFieldValue('filter_all'));
 
         const beforeUpload = (file: any) => {
             const isImage = file.type.indexOf('image/') >= 0;
@@ -188,7 +193,7 @@ class Categories extends React.Component<any, any, any> {
             }
             return false;
         };
-        const editorStateChanger = (editorState:any) => { this.setState({ editorState }) }
+        const editorStateChanger = (editorState: any) => { this.setState({ editorState }) }
 
         const formFields = () => {
             return (
@@ -197,8 +202,8 @@ class Categories extends React.Component<any, any, any> {
                         <Row gutter={16}>
                             <Col span={5}>
                                 <FormItem label="Изображение">
-                                    {getFieldDecorator('image', {
-                                        rules: [{required: true, message: 'Пожалуйста, выберите изображение!'}],
+                                    {getFieldDecorator('photo_url', {
+                                        rules: [{ required: true, message: 'Пожалуйста, выберите изображение!' }],
                                     })(
                                         <Upload
                                             listType="picture-card"
@@ -207,9 +212,9 @@ class Categories extends React.Component<any, any, any> {
                                             beforeUpload={beforeUpload}
                                             onChange={this.handleImageChange}>
                                             {this.state.imgUrl ?
-                                                <img src={this.state.imgUrl} width={'100%'} alt="image"/> :
+                                                <img src={this.state.imgUrl} width={'100%'} alt="image" /> :
                                                 <div>
-                                                    <Icon type={this.state.loadingUpload ? 'loading' : 'plus'}/>
+                                                    <Icon type={this.state.loadingUpload ? 'loading' : 'plus'} />
                                                     <div className="ant-upload-text">Выберите</div>
                                                 </div>}
                                         </Upload>)}
@@ -220,42 +225,42 @@ class Categories extends React.Component<any, any, any> {
                                     <Col span={12}>
                                         <FormItem label="Название">
                                             {getFieldDecorator('name', {
-                                                rules: [{required: true, message: 'Пожалуйста, введите название фильтра!'}],
-                                            })(<Input placeholder="Пожалуйста введите"/>)}
+                                                rules: [{ required: true, message: 'Пожалуйста, введите название фильтра!' }],
+                                            })(<Input placeholder="Пожалуйста введите" />)}
                                         </FormItem>
                                     </Col>
                                     <Col span={12}>
                                         <FormItem label="Родительский каталог">
-                                            {getFieldDecorator('parent', {
+                                            {getFieldDecorator('father_id', {
                                                 rules: [{
                                                     type: 'array',
                                                     required: true,
                                                     message: 'Пожалуйста выберите каталог!'
                                                 }],
                                             })(<Cascader
-                                                    options={this.state.dataTree}
-                                                    fieldNames={{label: 'name', value: 'id', children: 'children'}}
-                                                    placeholder="Пожалуйста выберите"
-                                                    changeOnSelect={true}
-                                                />
+                                                options={this.state.dataTree}
+                                                fieldNames={{ label: 'name', value: 'id', children: 'children' }}
+                                                placeholder="Пожалуйста выберите"
+                                                changeOnSelect={true}
+                                            />
                                             )}
                                         </FormItem>
                                     </Col>
                                     <Col span={12}>
-                                    <FormItem label="Все характеристики">
-                                        {getFieldDecorator('characteristic', {
-                                            rules: [{required: true, message: 'Пожалуйста, выберите характеристики!'}],
-                                        })(<Select
-                                            mode="multiple"
-                                            placeholder="Пожалуйста выберите">
-                                            {selectCharacteristic}
-                                        </Select>)}
-                                    </FormItem>
-                                </Col>
+                                        <FormItem label="Все характеристики">
+                                            {getFieldDecorator('filter_all', {
+                                                rules: [{ required: true, message: 'Пожалуйста, выберите характеристики!' }],
+                                            })(<Select
+                                                mode="multiple"
+                                                placeholder="Пожалуйста выберите">
+                                                {selectCharacteristic}
+                                            </Select>)}
+                                        </FormItem>
+                                    </Col>
                                     <Col span={12}>
                                         <FormItem label="Фильтры">
-                                            {getFieldDecorator('filters', {
-                                                rules: [{required: true, message: 'Пожалуйста, выберите фильтры!'}],
+                                            {getFieldDecorator('filters_check', {
+                                                rules: [{ required: true, message: 'Пожалуйста, выберите фильтры!' }],
                                             })(<Select
                                                 mode="multiple"
                                                 placeholder="Пожалуйста выберите">
@@ -269,19 +274,19 @@ class Categories extends React.Component<any, any, any> {
                         <Row gutter={16}>
                             <Col span={8}>
                                 <FormItem label="Title">
-                                    {getFieldDecorator('title', {
-                                        rules: [{required: true, message: 'Пожалуйста, введите Title!'}],
-                                    })(<Input placeholder="Пожалуйста введите"/>)}
+                                    {getFieldDecorator('meta_title', {
+                                        rules: [{ required: true, message: 'Пожалуйста, введите Title!' }],
+                                    })(<Input placeholder="Пожалуйста введите" />)}
                                 </FormItem>
                             </Col>
                             <Col span={8}>
                                 <FormItem label="Description">
-                                    {getFieldDecorator('description')(<Input placeholder="Пожалуйста введите"/>)}
+                                    {getFieldDecorator('meta_description')(<Input placeholder="Пожалуйста введите" />)}
                                 </FormItem>
                             </Col>
                             <Col span={8}>
                                 <FormItem label="Keywords">
-                                    {getFieldDecorator('keywords')(<Input placeholder="Пожалуйста введите"/>)}
+                                    {getFieldDecorator('meta_keywords')(<Input placeholder="Пожалуйста введите" />)}
                                 </FormItem>
                             </Col>
                             <Col span={24}>
@@ -310,11 +315,11 @@ class Categories extends React.Component<any, any, any> {
                             background: '#fff',
                             borderRadius: '0 0 4px 4px',
                         }}>
-                        <div style={{flex: 1}}>
+                        <div style={{ flex: 1 }}>
                             {deleteButton()}
                         </div>
                         <Button
-                            style={{marginRight: 8}}
+                            style={{ marginRight: 8 }}
                             onClick={this.handleClose}>
                             Отменить
                         </Button>
@@ -333,8 +338,8 @@ class Categories extends React.Component<any, any, any> {
                     onClose={this.handleClose}>
                     {formFields()}
                 </ActionDrawer>
-                <div style={{background: '#ffffff', padding: 10}}>
-                    <div style={{paddingBottom: 10}}>
+                <div style={{ background: '#ffffff', padding: 10 }}>
+                    <div style={{ paddingBottom: 10 }}>
                         <Button type="primary" onClick={this.handleShowDrawer.bind(this, '')}>Создать</Button>
                     </div>
                     <Table
@@ -343,8 +348,8 @@ class Categories extends React.Component<any, any, any> {
                         loading={this.state.loading}
                         size={'middle'}
                         dataSource={this.state.data}
-                        pagination={{pageSize: 50}}
-                        scroll={{y: height - 160}}>
+                        pagination={{ pageSize: 50 }}
+                        scroll={{ y: height - 160 }}>
                         {dataScheme.map(item => <Table.Column key={item.title} {...item} />)}
                         <Table.Column
                             key="action"
@@ -369,9 +374,9 @@ class Categories extends React.Component<any, any, any> {
                     }
                 }
             }).catch((error) => {
-            Notification(NOTIFICATION.getError);
-            return error
-        });
+                Notification(NOTIFICATION.getError);
+                return error
+            });
     }
 
     private requestGetTree() {
@@ -386,9 +391,9 @@ class Categories extends React.Component<any, any, any> {
                     }
                 }
             }).catch((error) => {
-            Notification(NOTIFICATION.getError);
-            return error
-        });
+                Notification(NOTIFICATION.getError);
+                return error
+            });
     }
 
     private requestGetCharacteristic() {
@@ -403,13 +408,13 @@ class Categories extends React.Component<any, any, any> {
                     }
                 }
             }).catch((error) => {
-            Notification(NOTIFICATION.getError);
-            return error
-        });
+                Notification(NOTIFICATION.getError);
+                return error
+            });
     }
 
     private requestAdd(data: any) {
-        request.post(API.addFilter, data)
+        request.post(API.addCategory, data)
             .then((response) => {
                 if (response.status === 200) {
                     Notification(NOTIFICATION.addSuccess);
@@ -420,7 +425,7 @@ class Categories extends React.Component<any, any, any> {
     };
 
     private requestEdit(data: any) {
-        request.post(API.editFilter, data)
+        request.post(API.editCategory, data)
             .then((response) => {
                 if (response.status === 200) {
                     Notification(NOTIFICATION.editSuccess);
@@ -431,7 +436,7 @@ class Categories extends React.Component<any, any, any> {
     };
 
     private requestDelete(data: any) {
-        request.post(API.deleteFilter, data)
+        request.post(API.deleteCategory, data)
             .then((response) => {
                 if (response.status === 200) {
                     Notification(NOTIFICATION.deleteSuccess);
@@ -440,9 +445,6 @@ class Categories extends React.Component<any, any, any> {
                 }
             })
     };
-
-    
-
 }
 
 export default Form.create()(Categories);
